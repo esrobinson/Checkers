@@ -17,6 +17,12 @@ class Board
     self[x, y].color
   end
 
+  def dup
+    dup_board = Board.new
+    dup_board.pieces = @pieces.map(&:dup)
+    dup_board
+  end
+
   def empty?(x, y)
     self[x, y].nil?
   end
@@ -51,5 +57,8 @@ class Board
       end.join(" ")
     end.join("\n")
   end
+
+  protected
+  attr_writer :pieces
 
 end

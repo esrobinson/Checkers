@@ -25,6 +25,10 @@ class Piece
     return [[1, -1], [-1, -1]]
   end
 
+  def dup(board)
+    Piece.new(@position, @color, board)
+  end
+
   def move_diff(pos)
     [pos.first - @position.first, pos.last - @position.last]
   end
@@ -69,6 +73,13 @@ class Piece
     return false unless new_x.between?(0, 7) && new_y.between?(0, 7)
     return false unless @board.empty?(pos.first, pos.last)
     @board.color?(cur_x + dir.first, cur_y + dir.last) == opposite_color
+  end
+
+  def valid_move_sequence?(move_sequence)
+    dup_board = board.dup
+    dup_board[@position.first, @position.last].perform_moves!(move_sequence)
+  end
+
   end
 
   def valid_slide?(pos)
