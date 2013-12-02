@@ -65,13 +65,16 @@ class Board
     end
   end
 
+  COLUMN_HEADERS = "  0 1 2 3 4 5 6 7\n"
   def to_s
-    (0...8).to_a.reverse.map do |col|
-      (0...8).map do |row|
-        if empty?(row, col)
+    COLUMN_HEADERS +
+    (0...8).to_a.reverse.map do |row|
+      "#{row.to_s} " +
+      (0...8).map do |col|
+        if empty?(col, row)
           "*"
         else
-          self[row, col].to_s
+          self[col, row].to_s
         end
       end.join(" ")
     end.join("\n")
