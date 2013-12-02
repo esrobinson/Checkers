@@ -18,6 +18,10 @@ class Board
     @board[x][y] = value
   end
 
+  def can_jump?(color)
+    pieces_of(color).any?(&:can_jump?)
+  end
+
   def capture(x, y)
     self[x, y] = nil
   end
@@ -43,6 +47,10 @@ class Board
 
   def empty?(x, y)
     self[x, y].nil?
+  end
+
+  def is_jump?(move_sequence)
+    (move_sequence[0].first - move_sequence[1].first).abs == 2
   end
 
   def lost?(color)
@@ -104,9 +112,12 @@ class Board
     end.join("\n")
   end
 
-  def validate_move(move, player_color)
-    start_pos = move.first
+  def validate_move(move_sequence, player_color)
+    start_pos = move_sequence.first
     unless color(start_pos.first, start_pos.last) == player_color
+      raise InvalidMoveError
+    end
+    if can_jump?(player_color) and !is_jump?(move_sequence)
       raise InvalidMoveError
     end
   end
