@@ -40,6 +40,17 @@ class Piece
     @position = pos
   end
 
+  def perform_moves!(move_sequence)
+    move_sequence.each do |move|
+      if move_diff(move).first.abs > 1
+        perform_jump(move)
+      else
+        raise InvalidMoveError if move_sequence.count > 1
+        perform_slide(move)
+      end
+    end
+  end
+
   def perform_slide(pos)
     raise InvalidMoveError unless valid_slide?(pos)
     @position = pos
