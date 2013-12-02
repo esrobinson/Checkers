@@ -1,4 +1,6 @@
+# coding: utf-8
 require_relative 'error'
+
 
 class Piece
   PIECE_STRINGS = {
@@ -12,11 +14,11 @@ class Piece
     }
   }
 
-  attr_reader :position, :color, :king
+  attr_reader :position, :color, :king, :board
 
-  def initialize(position, color, board)
+  def initialize(position, color, board, king = false)
     @position, @color, @board  = position, color, board
-    @king = false
+    @king = king
   end
 
   def directions
@@ -26,7 +28,12 @@ class Piece
   end
 
   def dup(board)
-    Piece.new(@position, @color, board)
+    Piece.new(@position, @color, board, @king)
+  end
+
+  def maybe_promote
+    back_row = color == :w ? 7 : 0
+    @king = true if @position.last == back_row
   end
 
   def move_diff(pos)
@@ -40,18 +47,27 @@ class Piece
   def perform_jump(pos)
     raise InvalidMoveError unless valid_jump?(pos)
     dir = move_diff(pos).map{ |x| x/2 }
-    @board.jump(@position.first + dir.first, @position.last + dir.last)
+    @board.capture(@position.first + dir.first, @position.last + dir.last)
     @position = pos
+  end
+
+  def perform_moves(move_sequence)
+    raise InvalidMoveError unless valid_move_sequence?(move_sequence)
+    perform_moves!(move_sequence)
   end
 
   def perform_moves!(move_sequence)
     move_sequence.each do |move|
       if move_diff(move).first.abs > 1
+        puts "jump!"
         perform_jump(move)
+        puts "jumped!"
       else
         raise InvalidMoveError if move_sequence.count > 1
+        puts "slide"
         perform_slide(move)
       end
+      maybe_promote
     end
   end
 
@@ -76,10 +92,15 @@ class Piece
   end
 
   def valid_move_sequence?(move_sequence)
-    dup_board = board.dup
-    dup_board[@position.first, @position.last].perform_moves!(move_sequence)
-  end
-
+    dup_board = @board.dup
+    puts dup_board
+    begin
+      dup_board[@position.first, @position.last].perform_moves!(move_sequence)
+    rescue
+      return false
+    else
+      return true
+    end
   end
 
   def valid_slide?(pos)

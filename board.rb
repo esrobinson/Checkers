@@ -19,7 +19,7 @@ class Board
 
   def dup
     dup_board = Board.new
-    dup_board.pieces = @pieces.map(&:dup)
+    dup_board.pieces = @pieces.map{ |piece| piece.dup(dup_board) }
     dup_board
   end
 
@@ -27,7 +27,7 @@ class Board
     self[x, y].nil?
   end
 
-  def jump(x, y)
+  def capture(x, y)
     @pieces.delete(self[x, y])
   end
 
