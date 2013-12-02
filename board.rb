@@ -45,6 +45,10 @@ class Board
     self[x, y].nil?
   end
 
+  def lost?(color)
+    pieces_of(color).none?(&:can_move?)
+  end
+
   def move(move_sequence, player_color)
     validate_move(move_sequence, player_color)
     start_pos = move_sequence.shift
@@ -106,13 +110,6 @@ class Board
       raise InvalidMoveError
     end
   end
-
-
-  def won?(color)
-    #fix later
-    false
-  end
-
 
   protected
   attr_writer :board

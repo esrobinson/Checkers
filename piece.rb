@@ -22,6 +22,28 @@ class Piece
     @king = king
   end
 
+  def can_move?
+   can_slide? || can_jump?
+  end
+
+  def can_jump?
+    possible_moves = []
+    directions.each do |dir|
+      possible_moves <<
+        [2 * dir.first + @position.first, 2 * dir.last + @position.last]
+    end
+    possible_moves.any?{ |pos| valid_jump?(pos) }
+  end
+
+  def can_slide?
+    possible_moves = []
+    directions.each do |dir|
+      possible_moves <<
+        [dir.first + @position.first, dir.last + @position.last]
+    end
+    possible_moves.any?{ |pos| valid_slide?(pos) }
+  end
+
   def directions
     return [[1, 1], [1, -1], [-1, 1], [-1, -1]] if @king
     return [[1, 1], [-1, 1]] if @color == :w
