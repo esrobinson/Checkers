@@ -1,16 +1,17 @@
 # coding: utf-8
 require_relative 'error'
+require 'colorize'
 
 
 class Piece
   PIECE_STRINGS = {
     :r => {
-      false =>  "r", #man
-      true => "R" #king
+      false =>  "\u25CF".red.on_green, #man
+      true => "\u265A".red.on_green #king
     },
     :w => {
-      false =>  "w", #man
-      true => "W" #king
+      false =>  "\u25CF".white.on_green, #man
+      true => "\u265A".white.on_green #king
     }
   }
 
@@ -48,7 +49,7 @@ class Piece
     raise InvalidMoveError unless valid_jump?(pos)
     dir = move_diff(pos).map{ |x| x/2 }
     @board.capture(@position.first + dir.first, @position.last + dir.last)
-    @board.move(@position, pos)
+    @board.move_piece(@position, pos)
     @position = pos
   end
 
@@ -71,7 +72,7 @@ class Piece
 
   def perform_slide(pos)
     raise InvalidMoveError unless valid_slide?(pos)
-    @board.move(@position, pos)
+    @board.move_piece(@position, pos)
     @position = pos
   end
 
@@ -87,12 +88,11 @@ class Piece
     return false unless directions.include?(dir)
     return false unless new_x.between?(0, 7) && new_y.between?(0, 7)
     return false unless @board.empty?(pos.first, pos.last)
-    @board.color?(cur_x + dir.first, cur_y + dir.last) == opposite_color
+    @board.color(cur_x + dir.first, cur_y + dir.last) == opposite_color
   end
 
   def valid_move_sequence?(move_sequence)
     dup_board = @board.dup
-    puts dup_board
     begin
       dup_board[@position.first, @position.last].perform_moves!(move_sequence)
     rescue

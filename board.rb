@@ -1,5 +1,6 @@
 require_relative 'piece'
 require_relative 'error'
+require 'colorize'
 
 class Board
   attr_reader :board
@@ -21,7 +22,7 @@ class Board
     self[x, y] = nil
   end
 
-  def color?(x, y)
+  def color(x, y)
     return nil if empty?(x, y)
     self[x, y].color
   end
@@ -44,7 +45,13 @@ class Board
     self[x, y].nil?
   end
 
-  def move(start_pos, end_pos)
+  def move(move_sequence, player_color)
+    validate_move(move_sequence, player_color)
+    start_pos = move_sequence.shift
+    self[start_pos.first, start_pos.last].perform_moves(move_sequence)
+  end
+
+  def move_piece(start_pos, end_pos)
     self[end_pos.first, end_pos.last] = self[start_pos.first, start_pos.last]
     self[start_pos.first, start_pos.last] = nil
   end
@@ -67,20 +74,31 @@ class Board
 
   COLUMN_HEADERS = "  0 1 2 3 4 5 6 7\n"
   def to_s
+    next_color, last_color = nil, :green
     COLUMN_HEADERS +
     (0...8).to_a.reverse.map do |row|
+      next_color, last_color = last_color, next_color
       "#{row.to_s} " +
       (0...8).map do |col|
+        next_color, last_color = last_color, next_color
         if empty?(col, row)
-          "*"
+          "  ".colorize(background: next_color)
         else
-          self[col, row].to_s
+          self[col, row].to_s + " ".on_green
         end
-      end.join(" ")
+      end.join("")
     end.join("\n")
   end
 
-  def won?
+  def validate_move(move, player_color)
+    start_pos = move.first
+    unless color(start_pos.first, start_pos.last) == player_color
+      raise InvalidMoveError
+    end
+  end
+
+
+  def won?(color)
     #fix later
     false
   end

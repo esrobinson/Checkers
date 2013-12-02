@@ -7,6 +7,7 @@ class HumanPlayer
 
   def playing_as(color)
     @color = color
+    self
   end
 
   def move
