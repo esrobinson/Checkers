@@ -80,6 +80,12 @@ class Board
     end.join("\n")
   end
 
+  def won?
+    #fix later
+    false
+  end
+
+
   protected
   attr_writer :board
 
