@@ -34,23 +34,13 @@ class Board
   def dup
     dup_board = Board.new
     dup_board.board = @board.map do |row|
-      row.map do |square|
-        if square.nil?
-          nil
-        else
-          square.dup(dup_board)
-        end
-      end
+      row.map { |square| square.nil? ? nil : square.dup(dup_board) }
     end
     dup_board
   end
 
   def empty?(x, y)
     self[x, y].nil?
-  end
-
-  def is_jump?(move_sequence)
-    (move_sequence[0].first - move_sequence[1].first).abs == 2
   end
 
   def lost?(color)
@@ -95,6 +85,7 @@ class Board
   end
 
   COLUMN_HEADERS = "  0 1 2 3 4 5 6 7\n"
+  EMPTY_SQUARE = "  "
   def to_s
     next_color, last_color = nil, :green
     COLUMN_HEADERS +
@@ -104,7 +95,7 @@ class Board
       (0...8).map do |col|
         next_color, last_color = last_color, next_color
         if empty?(col, row)
-          "  ".colorize(background: next_color)
+          EMPTY_SQUARE.colorize(background: next_color)
         else
           self[col, row].to_s + " ".on_green
         end
@@ -115,9 +106,6 @@ class Board
   def validate_move(move_sequence, player_color)
     start_pos = move_sequence.first
     unless color(start_pos.first, start_pos.last) == player_color
-      raise InvalidMoveError
-    end
-    if can_jump?(player_color) and !is_jump?(move_sequence)
       raise InvalidMoveError
     end
   end

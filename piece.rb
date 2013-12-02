@@ -127,6 +127,8 @@ class Piece
   def valid_slide?(pos)
     cur_x, cur_y = @position
     new_x, new_y = pos
+
+    return false if @board.can_jump?(@color)
     return false unless directions.include?(move_diff(pos))
     return false unless new_x.between?(0, 7) && new_y.between?(0, 7)
     return false unless @board.empty?(pos.first, pos.last)
