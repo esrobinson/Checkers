@@ -56,6 +56,16 @@ class Board
     self[start_pos.first, start_pos.last] = nil
   end
 
+  def pieces_of(color)
+    @board.flatten.select do |square|
+      if square.nil?
+        false
+      else
+        square.color == color
+      end
+    end
+  end
+
   def starting_pieces
     24.times do |i|
       if (i % 8 + i/8).even?
