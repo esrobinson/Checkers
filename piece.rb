@@ -60,16 +60,13 @@ class Piece
   def perform_moves!(move_sequence)
     move_sequence.each do |move|
       if move_diff(move).first.abs > 1
-        puts "jump!"
         perform_jump(move)
-        puts "jumped!"
       else
         raise InvalidMoveError if move_sequence.count > 1
-        puts "slide"
         perform_slide(move)
       end
-      maybe_promote
     end
+    maybe_promote
   end
 
   def perform_slide(pos)
