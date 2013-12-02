@@ -48,6 +48,7 @@ class Piece
     raise InvalidMoveError unless valid_jump?(pos)
     dir = move_diff(pos).map{ |x| x/2 }
     @board.capture(@position.first + dir.first, @position.last + dir.last)
+    @board.move(@position, pos)
     @position = pos
   end
 
@@ -73,6 +74,7 @@ class Piece
 
   def perform_slide(pos)
     raise InvalidMoveError unless valid_slide?(pos)
+    @board.move(@position, pos)
     @position = pos
   end
 

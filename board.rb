@@ -2,14 +2,23 @@ require_relative 'piece'
 require_relative 'error'
 
 class Board
-  attr_reader :pieces
+  attr_reader :board
 
   def initialize
-    @pieces = starting_pieces
+    @board = Array.new(8) { Array.new(8) }
+    starting_pieces
   end
 
   def [](x, y)
-    @pieces.find{ |piece| piece.position == [x, y] }
+    @board[x][y]
+  end
+
+  def []= (x, y, value)
+    @board[x][y] = value
+  end
+
+  def capture(x, y)
+    self[x, y] = nil
   end
 
   def color?(x, y)
@@ -19,7 +28,15 @@ class Board
 
   def dup
     dup_board = Board.new
-    dup_board.pieces = @pieces.map{ |piece| piece.dup(dup_board) }
+    dup_board.board = @board.map do |row|
+      row.map do |square|
+        if square.nil?
+          nil
+        else
+          square.dup(dup_board)
+        end
+      end
+    end
     dup_board
   end
 
@@ -27,23 +44,25 @@ class Board
     self[x, y].nil?
   end
 
-  def capture(x, y)
-    @pieces.delete(self[x, y])
+  def move(start_pos, end_pos)
+    self[end_pos.first, end_pos.last] = self[start_pos.first, start_pos.last]
+    self[start_pos.first, start_pos.last] = nil
   end
 
   def starting_pieces
-    pieces = []
     24.times do |i|
-      pieces << Piece.new([i % 8, i / 8], :w, self) if (i % 8 + i/8).even?
+      if (i % 8 + i/8).even?
+      @board[i % 8][i / 8] =
+              Piece.new([i % 8, i / 8], :w, self)
+      end
     end
 
     24.times do |i|
       if (i % 8 + i/8).even?
-        pieces << Piece.new([(63 - i) % 8, (63 - i) / 8], :r, self)
+        @board[(63 - i) % 8][(63 - i) / 8] =
+              Piece.new([(63 - i) % 8, (63 - i) / 8], :r, self)
       end
     end
-
-    pieces
   end
 
   def to_s
@@ -59,6 +78,6 @@ class Board
   end
 
   protected
-  attr_writer :pieces
+  attr_writer :board
 
 end
