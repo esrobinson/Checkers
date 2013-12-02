@@ -1,10 +1,28 @@
 require_relative 'piece'
+require_relative 'error'
 
 class Board
   attr_reader :pieces
 
   def initialize
     @pieces = starting_pieces
+  end
+
+  def [](x, y)
+    @pieces.find{ |piece| piece.position == [x, y] }
+  end
+
+  def color?(x, y)
+    return nil if empty?(x, y)
+    self[x, y].color
+  end
+
+  def empty?(x, y)
+    self[x, y].nil?
+  end
+
+  def jump(x, y)
+    @pieces.delete(self[x, y])
   end
 
   def starting_pieces
@@ -22,26 +40,16 @@ class Board
     pieces
   end
 
-  def [](x, y)
-    @pieces.find{ |piece| piece.position == [x, y] }
-  end
-
-  def empty?(x, y)
-    [x, y].nil?
-  end
-
   def to_s
-    (0...8).map do |col|
+    (0...8).to_a.reverse.map do |col|
       (0...8).map do |row|
-        if empty?(row, 7-col)
+        if empty?(row, col)
           "*"
         else
-          self[row, 7-col].to_s
+          self[row, col].to_s
         end
       end.join(" ")
     end.join("\n")
   end
-
-
 
 end
