@@ -1,3 +1,5 @@
+require_relative 'error'
+
 class HumanPlayer
   attr_reader :name, :color
 
@@ -18,7 +20,15 @@ class HumanPlayer
 
   def parse_move(move)
     positions = move.split(';')
-    positions.map{ |pos| pos.split(',').map(&:to_i)}
+    begin
+      parsed = positions.map do |pos|
+        pos.split(',').map { |coord| Integer(coord) - 1}
+      end
+    rescue ArgumentError => e
+      raise InvalidMoveError
+    end
+    raise InvalidMoveError if positions.count < 2
+    parsed
   end
 
 end

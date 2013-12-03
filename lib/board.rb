@@ -54,14 +54,14 @@ class Board
     self[start_pos.first, start_pos.last] = nil
   end
 
-  COLUMN_HEADERS = "  0 1 2 3 4 5 6 7\n"
+  COLUMN_HEADERS = "  1 2 3 4 5 6 7 8\n"
   EMPTY_SQUARE = "  "
   def to_s
     next_color, last_color = nil, :green
     COLUMN_HEADERS +
     (0...8).to_a.reverse.map do |row|
       next_color, last_color = last_color, next_color
-      "#{row.to_s} " +
+      "#{(row + 1).to_s} " +
       (0...8).map do |col|
         next_color, last_color = last_color, next_color
         if empty?(col, row)
@@ -82,6 +82,11 @@ class Board
 
   def []= (x, y, value)
     @board[x][y] = value
+  end
+
+  def on_board?(pos)
+    x, y = pos
+    x.between?(0,7) && y.between?(0,7)
   end
 
   def pieces_of(color)
@@ -108,6 +113,7 @@ class Board
 
   def validate_move(move_sequence, player_color)
     start_pos = move_sequence.first
+    raise InvalidMoveError unless on_board?(start_pos)
     unless color(start_pos.first, start_pos.last) == player_color
       raise InvalidPieceError
     end
