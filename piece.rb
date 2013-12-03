@@ -52,14 +52,17 @@ class Piece
   protected
 
   def perform_moves!(move_sequence)
+    jumped = false
     move_sequence.each do |move|
       if move_diff(move).first.abs > 1
+        jumped = true
         perform_jump(move)
       else
         raise InvalidMoveError if move_sequence.count > 1
         perform_slide(move)
       end
     end
+    raise InvalidMoveError if jumped and self.can_jump?
     maybe_promote
   end
 
