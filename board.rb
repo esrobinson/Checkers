@@ -14,10 +14,6 @@ class Board
     @board[x][y]
   end
 
-  def []= (x, y, value)
-    @board[x][y] = value
-  end
-
   def can_jump?(color)
     pieces_of(color).any?(&:can_jump?)
   end
@@ -58,32 +54,6 @@ class Board
     self[start_pos.first, start_pos.last] = nil
   end
 
-  def pieces_of(color)
-    @board.flatten.select do |square|
-      if square.nil?
-        false
-      else
-        square.color == color
-      end
-    end
-  end
-
-  def starting_pieces
-    24.times do |i|
-      if (i % 8 + i/8).even?
-      @board[i % 8][i / 8] =
-              Piece.new([i % 8, i / 8], :w, self)
-      end
-    end
-
-    24.times do |i|
-      if (i % 8 + i/8).even?
-        @board[(63 - i) % 8][(63 - i) / 8] =
-              Piece.new([(63 - i) % 8, (63 - i) / 8], :r, self)
-      end
-    end
-  end
-
   COLUMN_HEADERS = "  0 1 2 3 4 5 6 7\n"
   EMPTY_SQUARE = "  "
   def to_s
@@ -103,14 +73,45 @@ class Board
     end.join("\n")
   end
 
-  def validate_move(move_sequence, player_color)
-    start_pos = move_sequence.first
-    unless color(start_pos.first, start_pos.last) == player_color
-      raise InvalidMoveError
-    end
-  end
+
 
   protected
   attr_writer :board
+
+  private
+
+  def []= (x, y, value)
+    @board[x][y] = value
+  end
+
+  def pieces_of(color)
+    @board.flatten.select do |square|
+      square && square.color == color
+    end
+  end
+
+  def starting_pieces
+    24.times do |i|
+      if (i % 8 + i/8).even?
+      @board[i % 8][i / 8] =
+              Piece.new([i % 8, i / 8], :w, self)
+      end
+    end
+
+    24.times do |i|
+      if (i % 8 + i/8).even?
+        @board[(63 - i) % 8][(63 - i) / 8] =
+              Piece.new([(63 - i) % 8, (63 - i) / 8], :r, self)
+      end
+    end
+  end
+
+  def validate_move(move_sequence, player_color)
+    start_pos = move_sequence.first
+    unless color(start_pos.first, start_pos.last) == player_color
+      raise InvalidPieceError
+    end
+  end
+
 
 end
